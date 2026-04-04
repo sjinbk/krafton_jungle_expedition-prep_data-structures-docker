@@ -90,7 +90,37 @@ int main()
 
 int insertSortedLL(LinkedList *ll, int item)
 {
-	/* add your code here */
+	ListNode *cur;  // 순회용 포인터
+    int index = 0;  // 삽입 위치 추적 카운터
+
+    // ll 자체가 NULL이면 유효한 리스트가 아님 → 종료
+    if (ll == NULL){
+        return -1;
+    }
+
+    // 순회 시작점을 head로 설정
+    // head == NULL(빈 리스트)이면 cur = NULL → while 진입 안 함 → index = 0 유지
+    cur = ll->head;
+
+    // 1. 리스트를 앞에서부터 순회
+    // 2. 현재 노드의 item이 삽입할 item보다 큰 순간 → 그 앞에 삽입
+    while (cur != NULL){
+        if (cur->item > item){
+            break;  // 삽입 위치 확정 → 순회 중단
+        }
+        cur = cur->next;  // 다음 노드로 이동
+        index++;          // 위치 카운터 증가
+        // 끝까지 큰 노드를 못 찾으면 cur = NULL로 while 종료 → 맨 뒤에 삽입
+    }
+
+    // 3. 찾은 위치(index)에 삽입
+    // insertNode() 성공 시 0 반환 → 삽입된 index 반환
+    // insertNode() 실패 시 -1 반환 → 그대로 -1 반환
+    if (insertNode(ll, index, item) == 0){
+        return index;
+    }
+
+    return -1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
