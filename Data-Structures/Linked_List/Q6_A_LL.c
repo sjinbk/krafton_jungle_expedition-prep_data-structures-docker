@@ -88,7 +88,40 @@ int main()
 
 int moveMaxToFront(ListNode **ptrHead)
 {
-    /* add your code here */
+    // 1. 엣지 케이스
+	if (ptrHead == NULL || *ptrHead == NULL || (*ptrHead)->next == NULL)
+	{
+		return 0;
+	}
+    // 2. 포인터 초기화
+	ListNode *maxNode = *ptrHead;
+	ListNode *maxPre = NULL;
+	ListNode *cur = (*ptrHead)->next;
+	ListNode *pre = *ptrHead;
+
+    // 3. 순회
+	while (cur != NULL)
+	{
+		if (cur->item > maxNode->item)
+		{
+			maxNode = cur;
+			maxPre = pre;
+		}
+
+		pre = cur;
+		cur = cur->next;
+	}
+
+    // 4. 최댓값이 이미 head면 반환
+	if (maxPre == NULL)
+	{
+		return 0;
+	}
+
+    // 5. 떼어내고 앞에 연결
+	maxPre->next = maxNode->next;
+	maxNode->next = *ptrHead;
+	*ptrHead = maxNode;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
