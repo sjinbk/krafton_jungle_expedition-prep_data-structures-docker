@@ -102,7 +102,22 @@ int main()
 
 void frontBackSplitLinkedList(LinkedList *ll, LinkedList *resultFrontList, LinkedList *resultBackList)
 {
-	/* add your code here */
+	int frontSize = (ll->size + 1) / 2;
+	int i;
+
+	// resultFrontList 생성
+		// ll의 0번 인덱스부터 (frontSize - 1)번 인덱스까지의 값을
+		for (i = 0; i < frontSize; i++){
+			// resultFrontList의 뒤쪽에 차례대로 insertNode
+			insertNode(resultFrontList, resultFrontList->size, findNode(ll, i)->item);
+		}
+		
+	// resultBackList 생성
+		// ll의 frontSize번 인덱스부터 (ll->size - 1)번 인덱스까지의 값을
+		for (i = frontSize; i < ll->size; i++){
+			// resultBackList의 뒤쪽에 차례대로 insertNode
+			insertNode(resultBackList, resultBackList->size, findNode(ll,i)->item);
+		}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
