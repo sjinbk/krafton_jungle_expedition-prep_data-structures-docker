@@ -1,0 +1,49 @@
+name: Linked List CI
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/linked-list-ci.yml"
+      - "Data-Structures/Linked_List/**"
+  pull_request:
+    paths:
+      - ".github/workflows/linked-list-ci.yml"
+      - "Data-Structures/Linked_List/**"
+
+jobs:
+  linked-list-tests:
+    name: ${{ matrix.suite }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - Q1_A_LL_test
+          - Q2_A_LL_test
+          - Q3_A_LL_test
+          - Q4_A_LL_test
+          - Q5_A_LL_test
+          - Q6_A_LL_test
+          - Q7_A_LL_test
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install GCC and Valgrind
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential valgrind
+
+      - name: Show CI context
+        run: |
+          echo "suite: ${{ matrix.suite }}"
+          echo "repository: ${{ github.repository }}"
+          echo "ref: ${{ github.ref }}"
+
+      - name: Run Linked List test suite
+        working-directory: Data-Structures/Linked_List/tests
+        run: |
+          chmod +x ./run_all_tests.sh
+          ./run_all_tests.sh --suite "${{ matrix.suite }}"
