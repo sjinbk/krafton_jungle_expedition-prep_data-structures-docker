@@ -86,7 +86,49 @@ int main()
 
 void moveOddItemsToBack(LinkedList *ll)
 {
-	/* add your code here */
+	if (ll == NULL || ll->head == NULL || ll->size <= 0)
+	return;
+
+    // tail 초기화: 현재 리스트의 맨 끝 노드를 찾아 tail로 설정
+    ListNode *tail = ll->head;
+    while (tail->next != NULL)
+        tail = tail->next;
+
+    ListNode *pre = NULL;
+    ListNode *cur = ll->head;
+    int count = ll->size;  // 순회 종료 기준: 원래 리스트 size만큼만
+
+    while (count > 0)
+    {
+        if (cur->item % 2 != 0)  // 홀수 노드 발견
+        {
+            if (pre == NULL)
+            {
+                // head인 경우: ll->head를 다음 노드로 갱신
+                ll->head = cur->next;
+            }
+            else
+            {
+                // 일반 경우: 홀수 노드 연결 해제
+                pre->next = cur->next;
+            }
+
+            // 홀수 노드를 tail 뒤에 연결
+            tail->next = cur;
+            tail = tail->next;
+            tail->next = NULL;
+
+            // pre 고정, cur만 전진
+            cur = (pre == NULL) ? ll->head : pre->next;
+        }
+        else  // 짝수 노드
+        {
+            pre = cur;
+            cur = cur->next;
+        }
+		/* count--;
+		Github Actions 테스트를 위한 주석 처리 */
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
