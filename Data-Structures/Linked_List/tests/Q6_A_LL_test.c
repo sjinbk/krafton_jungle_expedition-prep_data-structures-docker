@@ -64,10 +64,10 @@ int main(void)
 {
 	printf("Running Q6_A_LL tests...\n");
 
-	test_move_max_to_front_from_middle();
-	test_move_max_to_front_when_already_head();
-	test_move_max_to_front_single_node();
-	test_move_max_to_front_empty_list();
+	RUN_TEST(test_move_max_to_front_from_middle);
+	RUN_TEST(test_move_max_to_front_when_already_head);
+	RUN_TEST(test_move_max_to_front_single_node);
+	RUN_TEST(test_move_max_to_front_empty_list);
 
 	return finish_test_suite("Q6_A_LL");
 }

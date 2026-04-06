@@ -79,11 +79,11 @@ int main(void)
 {
 	printf("Running Q1_A_LL tests...\n");
 
-	test_insert_sorted_empty();
-	test_insert_sorted_positions();
-	test_insert_sorted_duplicates();
-	test_insert_sorted_mixed_signs();
-	test_insert_sorted_null_list();
+	RUN_TEST(test_insert_sorted_empty);
+	RUN_TEST(test_insert_sorted_positions);
+	RUN_TEST(test_insert_sorted_duplicates);
+	RUN_TEST(test_insert_sorted_mixed_signs);
+	RUN_TEST(test_insert_sorted_null_list);
 
 	return finish_test_suite("Q1_A_LL");
 }

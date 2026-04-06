@@ -70,9 +70,9 @@ int main(void)
 {
 	printf("Running Q5_A_LL tests...\n");
 
-	test_front_back_split_even_count();
-	test_front_back_split_odd_count();
-	test_front_back_split_empty_list();
+	RUN_TEST(test_front_back_split_even_count);
+	RUN_TEST(test_front_back_split_odd_count);
+	RUN_TEST(test_front_back_split_empty_list);
 
 	return finish_test_suite("Q5_A_LL");
 }

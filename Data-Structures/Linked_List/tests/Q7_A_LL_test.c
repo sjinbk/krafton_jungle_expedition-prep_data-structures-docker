@@ -50,9 +50,9 @@ int main(void)
 {
 	printf("Running Q7_A_LL tests...\n");
 
-	test_recursive_reverse_multiple_nodes();
-	test_recursive_reverse_single_node();
-	test_recursive_reverse_empty_list();
+	RUN_TEST(test_recursive_reverse_multiple_nodes);
+	RUN_TEST(test_recursive_reverse_single_node);
+	RUN_TEST(test_recursive_reverse_empty_list);
 
 	return finish_test_suite("Q7_A_LL");
 }

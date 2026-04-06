@@ -65,10 +65,10 @@ int main(void)
 {
 	printf("Running Q3_A_LL tests...\n");
 
-	test_move_odd_items_to_back_partition();
-	test_move_odd_items_to_back_all_odd();
-	test_move_odd_items_to_back_all_even();
-	test_move_odd_items_to_back_empty();
+	RUN_TEST(test_move_odd_items_to_back_partition);
+	RUN_TEST(test_move_odd_items_to_back_all_odd);
+	RUN_TEST(test_move_odd_items_to_back_all_even);
+	RUN_TEST(test_move_odd_items_to_back_empty);
 
 	return finish_test_suite("Q3_A_LL");
 }

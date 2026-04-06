@@ -91,10 +91,10 @@ int main(void)
 {
 	printf("Running Q2_A_LL tests...\n");
 
-	test_alternate_merge_equal_length();
-	test_alternate_merge_second_longer();
-	test_alternate_merge_first_longer();
-	test_alternate_merge_with_empty_second();
+	RUN_TEST(test_alternate_merge_equal_length);
+	RUN_TEST(test_alternate_merge_second_longer);
+	RUN_TEST(test_alternate_merge_first_longer);
+	RUN_TEST(test_alternate_merge_with_empty_second);
 
 	return finish_test_suite("Q2_A_LL");
 }
