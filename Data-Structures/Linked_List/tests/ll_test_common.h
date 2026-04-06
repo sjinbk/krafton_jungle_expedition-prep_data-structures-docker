@@ -131,12 +131,12 @@ static void expect_list_equals(LinkedList *ll, const int *expected, int count, c
 }
 
 #if LL_TEST_TIMEOUT_ENABLED
-static sigjmp_buf g_test_timeout_env;
+static jmp_buf g_test_timeout_env;
 
 static void ll_test_alarm_handler(int signal_number)
 {
 	(void)signal_number;
-	siglongjmp(g_test_timeout_env, 1);
+	longjmp(g_test_timeout_env, 1);
 }
 
 static void run_test_with_timeout(void (*test_fn)(void), const char *test_name)
@@ -145,7 +145,7 @@ static void run_test_with_timeout(void (*test_fn)(void), const char *test_name)
 
 	previous_handler = signal(SIGALRM, ll_test_alarm_handler);
 
-	if (sigsetjmp(g_test_timeout_env, 1) == 0) {
+	if (setjmp(g_test_timeout_env) == 0) {
 		alarm(LL_TEST_TIMEOUT_SECONDS);
 		test_fn();
 		alarm(0);
