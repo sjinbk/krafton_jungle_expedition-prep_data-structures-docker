@@ -126,8 +126,7 @@ void moveOddItemsToBack(LinkedList *ll)
             pre = cur;
             cur = cur->next;
         }
-		/* count--;
-		Github Actions 테스트를 위한 주석 처리 */
+		count--;
     }
 }
 
