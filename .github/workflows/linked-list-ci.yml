@@ -12,20 +12,121 @@ on:
       - "Data-Structures/Linked_List/**"
 
 jobs:
+  detect-changes:
+    name: Detect changed suites
+    runs-on: ubuntu-latest
+    outputs:
+      suites: ${{ steps.pick.outputs.suites }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Select suites to run
+        id: pick
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          all_suites=(
+            Q1_A_LL_test
+            Q2_A_LL_test
+            Q3_A_LL_test
+            Q4_A_LL_test
+            Q5_A_LL_test
+            Q6_A_LL_test
+            Q7_A_LL_test
+          )
+
+          changed_files=()
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            changed_files+=(".github/workflows/linked-list-ci.yml")
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            base_ref="${{ github.event.pull_request.base.sha }}"
+            head_ref="${{ github.event.pull_request.head.sha }}"
+            while IFS= read -r line; do
+              changed_files+=("$line")
+            done < <(git diff --name-only "$base_ref" "$head_ref")
+          else
+            before_ref="${{ github.event.before }}"
+            after_ref="${{ github.sha }}"
+
+            if [[ "$before_ref" == "0000000000000000000000000000000000000000" ]]; then
+              while IFS= read -r line; do
+                changed_files+=("$line")
+              done < <(git diff-tree --no-commit-id --name-only -r "$after_ref")
+            else
+              while IFS= read -r line; do
+                changed_files+=("$line")
+              done < <(git diff --name-only "$before_ref" "$after_ref")
+            fi
+          fi
+
+          selected_suites=()
+          run_all=false
+
+          for file in "${changed_files[@]}"; do
+            case "$file" in
+              Data-Structures/Linked_List/Q1_A_LL.c|Data-Structures/Linked_List/tests/Q1_A_LL_test.c)
+                selected_suites+=("Q1_A_LL_test")
+                ;;
+              Data-Structures/Linked_List/Q2_A_LL.c|Data-Structures/Linked_List/tests/Q2_A_LL_test.c)
+                selected_suites+=("Q2_A_LL_test")
+                ;;
+              Data-Structures/Linked_List/Q3_A_LL.c|Data-Structures/Linked_List/tests/Q3_A_LL_test.c)
+                selected_suites+=("Q3_A_LL_test")
+                ;;
+              Data-Structures/Linked_List/Q4_A_LL.c|Data-Structures/Linked_List/tests/Q4_A_LL_test.c)
+                selected_suites+=("Q4_A_LL_test")
+                ;;
+              Data-Structures/Linked_List/Q5_A_LL.c|Data-Structures/Linked_List/tests/Q5_A_LL_test.c)
+                selected_suites+=("Q5_A_LL_test")
+                ;;
+              Data-Structures/Linked_List/Q6_A_LL.c|Data-Structures/Linked_List/tests/Q6_A_LL_test.c)
+                selected_suites+=("Q6_A_LL_test")
+                ;;
+              Data-Structures/Linked_List/Q7_A_LL.c|Data-Structures/Linked_List/tests/Q7_A_LL_test.c)
+                selected_suites+=("Q7_A_LL_test")
+                ;;
+              Data-Structures/Linked_List/tests/ll_test_common.h|Data-Structures/Linked_List/tests/run_all_tests.sh|.github/workflows/linked-list-ci.yml)
+                run_all=true
+                ;;
+            esac
+
+            if [[ "$run_all" == "true" ]]; then
+              break
+            fi
+          done
+
+          if [[ "$run_all" == "true" ]]; then
+            json=$(printf '%s\n' "${all_suites[@]}" | jq -R . | jq -s -c .)
+            echo "suites=$json" >> "$GITHUB_OUTPUT"
+            echo "Selected all suites: $json"
+            exit 0
+          fi
+
+          if [[ ${#selected_suites[@]} -eq 0 ]]; then
+            echo 'suites=[]' >> "$GITHUB_OUTPUT"
+            echo "No matching Linked List suite changes detected."
+            exit 0
+          fi
+
+          json=$(printf '%s\n' "${selected_suites[@]}" | sort -u | jq -R . | jq -s -c .)
+          echo "suites=$json" >> "$GITHUB_OUTPUT"
+          echo "Selected suites: $json"
+
   linked-list-tests:
     name: ${{ matrix.suite }}
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.suites != '[]' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        suite:
-          - Q1_A_LL_test
-          - Q2_A_LL_test
-          - Q3_A_LL_test
-          - Q4_A_LL_test
-          - Q5_A_LL_test
-          - Q6_A_LL_test
-          - Q7_A_LL_test
+        suite: ${{ fromJson(needs.detect-changes.outputs.suites) }}
 
     steps:
       - name: Check out repository
@@ -34,7 +135,7 @@ jobs:
       - name: Install GCC and Valgrind
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential valgrind
+          sudo apt-get install -y build-essential valgrind jq
 
       - name: Show CI context
         run: |
