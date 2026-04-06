@@ -1,0 +1,150 @@
+name: Stack and Queue CI
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/stack-and-queue-ci.yml"
+      - "Data-Structures/Stack_and_Queue/**"
+  pull_request:
+    paths:
+      - ".github/workflows/stack-and-queue-ci.yml"
+      - "Data-Structures/Stack_and_Queue/**"
+
+jobs:
+  detect-changes:
+    name: Detect changed suites
+    runs-on: ubuntu-latest
+    outputs:
+      suites: ${{ steps.pick.outputs.suites }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Select suites to run
+        id: pick
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          all_suites=(
+            Q1_C_SQ_test
+            Q2_C_SQ_test
+            Q3_C_SQ_test
+            Q4_C_SQ_test
+            Q5_C_SQ_test
+            Q6_C_SQ_test
+            Q7_C_SQ_test
+          )
+
+          changed_files=()
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            changed_files+=(".github/workflows/stack-and-queue-ci.yml")
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            base_ref="${{ github.event.pull_request.base.sha }}"
+            head_ref="${{ github.event.pull_request.head.sha }}"
+            while IFS= read -r line; do
+              changed_files+=("$line")
+            done < <(git diff --name-only "$base_ref" "$head_ref")
+          else
+            before_ref="${{ github.event.before }}"
+            after_ref="${{ github.sha }}"
+
+            if [[ "$before_ref" == "0000000000000000000000000000000000000000" ]]; then
+              while IFS= read -r line; do
+                changed_files+=("$line")
+              done < <(git diff-tree --no-commit-id --name-only -r "$after_ref")
+            else
+              while IFS= read -r line; do
+                changed_files+=("$line")
+              done < <(git diff --name-only "$before_ref" "$after_ref")
+            fi
+          fi
+
+          selected_suites=()
+          run_all=false
+
+          for file in "${changed_files[@]}"; do
+            case "$file" in
+              Data-Structures/Stack_and_Queue/Q1_C_SQ.c|Data-Structures/Stack_and_Queue/tests/Q1_C_SQ_test.c)
+                selected_suites+=("Q1_C_SQ_test")
+                ;;
+              Data-Structures/Stack_and_Queue/Q2_C_SQ.c|Data-Structures/Stack_and_Queue/tests/Q2_C_SQ_test.c)
+                selected_suites+=("Q2_C_SQ_test")
+                ;;
+              Data-Structures/Stack_and_Queue/Q3_C_SQ.c|Data-Structures/Stack_and_Queue/tests/Q3_C_SQ_test.c)
+                selected_suites+=("Q3_C_SQ_test")
+                ;;
+              Data-Structures/Stack_and_Queue/Q4_C_SQ.c|Data-Structures/Stack_and_Queue/tests/Q4_C_SQ_test.c)
+                selected_suites+=("Q4_C_SQ_test")
+                ;;
+              Data-Structures/Stack_and_Queue/Q5_C_SQ.c|Data-Structures/Stack_and_Queue/tests/Q5_C_SQ_test.c)
+                selected_suites+=("Q5_C_SQ_test")
+                ;;
+              Data-Structures/Stack_and_Queue/Q6_C_SQ.c|Data-Structures/Stack_and_Queue/tests/Q6_C_SQ_test.c)
+                selected_suites+=("Q6_C_SQ_test")
+                ;;
+              Data-Structures/Stack_and_Queue/Q7_C_SQ.c|Data-Structures/Stack_and_Queue/tests/Q7_C_SQ_test.c)
+                selected_suites+=("Q7_C_SQ_test")
+                ;;
+              Data-Structures/Stack_and_Queue/tests/sq_test_common.h|Data-Structures/Stack_and_Queue/tests/run_all_tests.sh|.github/workflows/stack-and-queue-ci.yml)
+                run_all=true
+                ;;
+            esac
+
+            if [[ "$run_all" == "true" ]]; then
+              break
+            fi
+          done
+
+          if [[ "$run_all" == "true" ]]; then
+            json=$(printf '%s\n' "${all_suites[@]}" | jq -R . | jq -s -c .)
+            echo "suites=$json" >> "$GITHUB_OUTPUT"
+            echo "Selected all suites: $json"
+            exit 0
+          fi
+
+          if [[ ${#selected_suites[@]} -eq 0 ]]; then
+            echo 'suites=[]' >> "$GITHUB_OUTPUT"
+            echo "No matching Stack and Queue suite changes detected."
+            exit 0
+          fi
+
+          json=$(printf '%s\n' "${selected_suites[@]}" | sort -u | jq -R . | jq -s -c .)
+          echo "suites=$json" >> "$GITHUB_OUTPUT"
+          echo "Selected suites: $json"
+
+  stack-and-queue-tests:
+    name: ${{ matrix.suite }}
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.suites != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: ${{ fromJson(needs.detect-changes.outputs.suites) }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install GCC and Valgrind
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential valgrind jq
+
+      - name: Show CI context
+        run: |
+          echo "suite: ${{ matrix.suite }}"
+          echo "repository: ${{ github.repository }}"
+          echo "ref: ${{ github.ref }}"
+
+      - name: Run Stack and Queue test suite
+        working-directory: Data-Structures/Stack_and_Queue/tests
+        run: |
+          chmod +x ./run_all_tests.sh
+          ./run_all_tests.sh --suite "${{ matrix.suite }}"
