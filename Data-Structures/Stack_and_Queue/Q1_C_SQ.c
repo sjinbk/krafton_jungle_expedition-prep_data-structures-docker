@@ -116,12 +116,51 @@ int main()
 
 void createQueueFromLinkedList(LinkedList *ll, Queue *q)
 {
-	/* add your code here */
+	ListNode *cur;
+
+	// 예외 조건
+	if (ll == NULL || q == NULL)
+	{
+		return;
+	}
+
+	// 선행 요구사항
+	removeAllItemsFromQueue(q);
+
+	// 초기 노드 포인팅
+	cur = ll->head;
+
+	// 리스트 전체 순회하며 큐에 삽입
+	while (cur != NULL)
+	{
+		enqueue(q, cur->item);
+		cur = cur->next;
+	}
+	
 }
 
 void removeOddValues(Queue *q)
 {
-	/* add your code here */
+	// 초기 지역변수 선언
+	int count, i, item;
+
+	// 포인터 오류 시 엣지 케이스 -> 종료 처리
+	if (q == NULL)
+	{
+		return;
+	}
+
+	// 큐 개수만큼 순회하여, 일단 빼고 짝수면 다시 넣기
+	count = q->ll.size;
+	for (i = 0; i < count; i++)
+	{
+		item = dequeue(q);
+
+		if (item % 2 == 0)
+		{
+			enqueue(q, item);
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////
