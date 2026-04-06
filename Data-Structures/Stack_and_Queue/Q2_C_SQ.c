@@ -113,12 +113,53 @@ int main()
 
 void createStackFromLinkedList(LinkedList *ll, Stack *s)
 {
-    /* add your code here */
+	ListNode *cur;
+	
+    // NULL 종료처리
+	if (ll == NULL || s == NULL)
+	{
+		return;
+	}
+
+	// 선행 요구사항
+	removeAllItemsFromStack(s);
+
+	// 순회 포인터 기준으로 리스트 돌면서 멤버 push 처리
+	cur = ll->head;
+	while (cur != NULL)
+	{
+		push(s, cur->item);
+		cur = cur->next;
+	}
+	
 }
 
 void removeEvenValues(Stack *s)
 {
-	/* add your code here */
+	ListNode *cur;
+
+	// 기존 리스트에서 짝수만 빼는걸 스택으로 구현해야함
+	// 임시 스택두고 홀수만 push 했다가, 원래 리스트로 push하면 LateOut 2번 반복되어 원래 순서 보존
+
+	Stack temp;
+	int item;
+
+	temp.ll.head = NULL;
+	temp.ll.size = 0;
+
+	while (!isEmptyStack(s))
+	{
+		item = pop(s);
+		if (item % 2 != 0)
+		{
+			push(&temp, item);
+		}
+	}
+
+	while (!isEmptyStack(&temp))
+	{
+		push(s, pop(&temp));
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////////////
