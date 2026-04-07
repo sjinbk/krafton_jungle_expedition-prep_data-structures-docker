@@ -47,7 +47,7 @@ static void test_pairwise_consecutive_false(void)
 	removeAllItems(&(s.ll));
 }
 
-static void test_pairwise_consecutive_odd_count_allows_last_item(void)
+static void test_pairwise_consecutive_odd_count_false(void)
 {
 	Stack s;
 	int top_to_bottom[] = {6, 5, 2};
@@ -55,12 +55,13 @@ static void test_pairwise_consecutive_odd_count_allows_last_item(void)
 	init_stack(&s);
 	push_top_to_bottom(&s, top_to_bottom, 3);
 
-	EXPECT_TRUE(isStackPairwiseConsecutive(&s), "isStackPairwiseConsecutive allows a trailing unpaired item");
+	EXPECT_TRUE(!isStackPairwiseConsecutive(&s), "isStackPairwiseConsecutive returns false when the stack size is odd");
+	expect_list_equals(&(s.ll), top_to_bottom, 3, "isStackPairwiseConsecutive restores the original stack order when rejecting an odd-sized stack");
 
 	removeAllItems(&(s.ll));
 }
 
-static void test_pairwise_consecutive_empty_and_singleton(void)
+static void test_pairwise_consecutive_empty_true_singleton_false(void)
 {
 	Stack empty_stack;
 	Stack single_stack;
@@ -71,7 +72,8 @@ static void test_pairwise_consecutive_empty_and_singleton(void)
 	push_top_to_bottom(&single_stack, single_value, 1);
 
 	EXPECT_TRUE(isStackPairwiseConsecutive(&empty_stack), "isStackPairwiseConsecutive treats an empty stack as pairwise consecutive");
-	EXPECT_TRUE(isStackPairwiseConsecutive(&single_stack), "isStackPairwiseConsecutive treats a single-item stack as pairwise consecutive");
+	EXPECT_TRUE(!isStackPairwiseConsecutive(&single_stack), "isStackPairwiseConsecutive returns false for a single-item stack because its size is odd");
+	expect_list_equals(&(single_stack.ll), single_value, 1, "isStackPairwiseConsecutive preserves a single-item stack when returning false");
 
 	removeAllItems(&(empty_stack.ll));
 	removeAllItems(&(single_stack.ll));
@@ -83,8 +85,8 @@ int main(void)
 
 	RUN_TEST(test_pairwise_consecutive_even_count_true);
 	RUN_TEST(test_pairwise_consecutive_false);
-	RUN_TEST(test_pairwise_consecutive_odd_count_allows_last_item);
-	RUN_TEST(test_pairwise_consecutive_empty_and_singleton);
+	RUN_TEST(test_pairwise_consecutive_odd_count_false);
+	RUN_TEST(test_pairwise_consecutive_empty_true_singleton_false);
 
 	return finish_test_suite("Q3_C_SQ");
 }

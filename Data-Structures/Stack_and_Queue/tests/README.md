@@ -46,7 +46,7 @@
 - `createStackFromLinkedList`
   stack이 비어 있지 않으면 먼저 비우고, linked list의 첫 번째 노드부터 마지막 노드까지 순서대로 push합니다. 따라서 최종 stack의 top은 원래 linked list의 마지막 값이 됩니다.
 - `isStackPairwiseConsecutive`
-  stack의 top부터 두 개씩 짝을 지어 검사하며, 각 pair의 차이 절댓값이 1이면 연속이라고 봅니다. 원소 개수가 홀수이면 마지막 하나는 허용하고, 검사 후 stack 순서는 원래대로 복원된다고 가정합니다.
+  stack의 top부터 두 개씩 짝을 지어 검사하며, 원소 개수가 홀수이면 즉시 0을 반환한다고 가정합니다. 짝수 개수인 경우 각 pair의 차이 절댓값이 1인지 검사하고, 하나라도 조건을 만족하지 않으면 0, 모두 통과하면 1을 반환하며 검사 후 stack 순서는 원래대로 복원된다고 가정합니다.
 - `removeUntil`
   top부터 pop하다가 선택한 값이 처음으로 나타나면 멈추며, 그 값 자체는 stack에 남겨 둡니다. 값이 없으면 stack은 비게 됩니다.
 - `balanced`
